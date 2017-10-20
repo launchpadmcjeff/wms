@@ -5,6 +5,7 @@ import java.net.URL;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.graphene.page.InitialPage;
 import org.jboss.arquillian.graphene.page.Page;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -43,7 +44,7 @@ public class LoginTest2 {
     LoginPage2 loginPage;
  
     @Test/*(expected = LoginFailedException.class)*/
-    public void testLoginFailed() {
+    public void testLoginFailed(@InitialPage LoginPage2 loginPage) {
         loginPage.getLoginForm().login("non-existent", "user");
     }
 }

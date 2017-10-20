@@ -44,6 +44,6 @@ public class HomePageTest {
 		loginPage.login(USER_NAME, USER_PASSWORD);
 		homePage.assertOnHomePage();
 
-		assertEquals(homePage.getUserName(), USER_NAME);
+		assertEquals(USER_NAME, homePage.getUserName());
 	}
 }

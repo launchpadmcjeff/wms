@@ -4,15 +4,18 @@ import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertEquals;
 
 import org.jboss.arquillian.graphene.GrapheneElement;
+import org.jboss.arquillian.graphene.findby.FindByJQuery;
+import org.jboss.arquillian.graphene.page.Location;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+@Location("home.xhtml")
 public class HomePage {
 
 	@FindBy(tagName = "li")
 	private WebElement facesMessage;
 
-	@FindBy(using = "#whoami p:visible")
+	@FindByJQuery("#whoami p:visible")
 	private GrapheneElement signedAs;
 
 	@FindBy(css = "input[type=submit]")
@@ -30,7 +33,7 @@ public class HomePage {
 		if (!signedAs.isPresent()) {
 			whoAmI();
 		}
-		return signedAs.getText();
+		return signedAs.getText().substring("You are signed in as ".length(), signedAs.getText().length() - 1);
 	}
 
 	private void whoAmI() {

@@ -21,7 +21,7 @@ public class LoginPage {
 	private WebElement loginButton;
 	
     @Drone
-    WebDriver browser;
+    private WebDriver browser;
 	
 //    @FindBy(css = "input[type=text]")
 //    private WebElement userName;
