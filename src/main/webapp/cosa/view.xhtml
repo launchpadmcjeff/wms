@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	template="/resources/scaffold/pageTemplate.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="id" value='#{cosaBean.id}'/>
+		<f:event type="preRenderView" listener='#{cosaBean.retrieve}'/>
+	</f:metadata>
+
+	<ui:param name="pageTitle" value="View Cosa"/>
+
+	<ui:define name="header">
+		Cosa
+	</ui:define>
+
+	<ui:define name="subheader">
+		View existing Cosa
+	</ui:define>
+
+	<ui:define name="footer"/>
+
+	<ui:define name="main">
+		<h:panelGrid columnClasses="label,component,required" columns="3">
+			<h:outputLabel for="cosaBeanCosaName" value="Name:"/>
+			<h:outputText id="cosaBeanCosaName" value="#{cosaBean.cosa.name}"/>
+			<h:outputText/>
+			<h:outputLabel for="cosaBeanCosaDescription" value="Description:"/>
+			<h:outputText id="cosaBeanCosaDescription" value="#{cosaBean.cosa.description}"/>
+			<h:outputText/>
+			<h:outputLabel for="cosaBeanCosaKeywords" value="Keywords:"/>
+			<h:outputText id="cosaBeanCosaKeywords" value="#{cosaBean.cosa.keywords}"/>
+			<h:outputText/>
+			<h:outputLabel for="cosaBeanCosaPrice" value="Price:"/>
+			<h:outputText id="cosaBeanCosaPrice" value="#{cosaBean.cosa.price}"/>
+			<h:outputText/>
+			<h:outputLabel for="cosaBeanCosaListingDate" value="Listing Date:"/>
+			<h:outputText id="cosaBeanCosaListingDate" value="#{cosaBean.cosa.listingDate}">
+				<f:convertDateTime type="date"/>
+			</h:outputText>
+			<h:outputText/>
+		</h:panelGrid>
+
+		<div class="buttons">
+			<h:link value="View All" outcome="search" styleClass="btn btn-primary"/> 
+			<h:link value="Edit" outcome="create" includeViewParams="true" styleClass="btn btn-primary"/>
+			<h:link value="Create New" outcome="create" styleClass="btn btn-primary"/>
+		</div>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/resources/scaffold/pageTemplate.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="id" value='#{cosaBean.id}'/>
+		<f:event type="preRenderView" listener='#{cosaBean.retrieve}'/>
+	</f:metadata>
+
+	<ui:param name="pageTitle" value="Create Cosa"/>
+
+	<ui:define name="header">
+		Cosa
+	</ui:define>
+
+	<ui:define name="subheader">
+		<c:choose>
+			<c:when test='#{!empty cosaBean.id}'>
+				Edit existing Cosa
+			</c:when>
+			<c:otherwise>
+				Create a new Cosa
+			</c:otherwise>
+		</c:choose>
+	</ui:define>
+
+	<ui:define name="footer"/>
+
+	<ui:define name="main">
+		<h:form id="create">
+			<h:messages globalOnly="true" styleClass="error"/>
+
+			<h:panelGrid columnClasses="label,component,required" columns="3">
+				<h:outputLabel for="cosaBeanCosaName" value="Name:"/>
+				<h:panelGroup>
+					<h:inputText id="cosaBeanCosaName" required="true" value="#{cosaBean.cosa.name}"/>
+					<h:message for="cosaBeanCosaName" styleClass="error"/>
+				</h:panelGroup>
+				<h:outputText value="*"/>
+				<h:outputLabel for="cosaBeanCosaDescription" value="Description:"/>
+				<h:panelGroup>
+					<h:inputText id="cosaBeanCosaDescription" value="#{cosaBean.cosa.description}"/>
+					<h:message for="cosaBeanCosaDescription" styleClass="error"/>
+				</h:panelGroup>
+				<h:outputText/>
+				<h:outputLabel for="cosaBeanCosaKeywords" value="Keywords:"/>
+				<h:panelGroup>
+					<h:inputText id="cosaBeanCosaKeywords" value="#{cosaBean.cosa.keywords}"/>
+					<h:message for="cosaBeanCosaKeywords" styleClass="error"/>
+				</h:panelGroup>
+				<h:outputText/>
+				<h:outputLabel for="cosaBeanCosaPrice" value="Price:"/>
+				<h:panelGroup>
+					<h:inputText id="cosaBeanCosaPrice" value="#{cosaBean.cosa.price}"/>
+					<h:message for="cosaBeanCosaPrice" styleClass="error"/>
+				</h:panelGroup>
+				<h:outputText/>
+				<h:outputLabel for="cosaBeanCosaListingDate" value="Listing Date:"/>
+				<h:panelGroup>
+					<h:inputText id="cosaBeanCosaListingDate" value="#{cosaBean.cosa.listingDate}">
+						<f:convertDateTime type="date"/>
+					</h:inputText>
+					<h:message for="cosaBeanCosaListingDate" styleClass="error"/>
+				</h:panelGroup>
+				<h:outputText/>
+			</h:panelGrid>
+
+			<div class="buttons">
+				<h:commandLink value="Save" action='#{cosaBean.update}' styleClass="btn btn-primary"/>
+				<c:choose>
+					<c:when test='#{!empty cosaBean.id}'>
+						<h:link value="Cancel" outcome="view" styleClass="btn btn-primary">
+							<f:param name="id" value='#{cosaBean.id}'/>
+						</h:link>
+						<h:commandLink value="Delete" action='#{cosaBean.delete}' styleClass="btn btn-primary"/>
+					</c:when>
+					<c:otherwise>
+						<h:link value="Cancel" outcome="search" styleClass="btn btn-primary"/>
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</h:form>
+	</ui:define>
+
+</ui:composition>
