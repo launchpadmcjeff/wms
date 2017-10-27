@@ -49,6 +49,13 @@
             "Default": "warez-my-stuff-codepipeline",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "GitBranch": {
+            "Description": "The EC2 tag key that identifies this as a target for deployments.",
+            "Type": "String",
+            "Default": "master",
+            "AllowedPattern": "[\\x20-\\x7E]*",
+            "ConstraintDescription": "Can contain only ASCII characters."
         }
     },
     "Resources": {
@@ -76,19 +83,20 @@
                                     "Category": "Source",
                                     "Owner": "AWS",
                                     "Version": "1",
-                                    "Provider": "S3"
+                                    "Provider": "CodeCommit"
+                                },
+                                "Configuration": {
+                                    "BranchName": {
+                                        "Ref": "GitBranch"
+                                    },
+                                    "RepositoryName": "warez-my-stuff",
+                                    "PollForSourceChanges": false
                                 },
                                 "OutputArtifacts": [
                                     {
                                         "Name": "SourceOutput"
                                     }
                                 ],
-                                "Configuration": {
-                                    "S3Bucket": {
-                                        "Ref": "ArtifactStoreS3Location"
-                                    },
-                                    "S3ObjectKey": "SourceS3ObjectKey"
-                                },
                                 "RunOrder": 1
                             }
                         ]
