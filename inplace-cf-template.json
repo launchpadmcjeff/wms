@@ -5,14 +5,14 @@
     "TagKey": {
       "Description": "The EC2 tag key that identifies this as a target for deployments.",
       "Type": "String",
-	  "Default": "Name",
+      "Default": "Name",
       "AllowedPattern": "[\\x20-\\x7E]*",
       "ConstraintDescription": "Can contain only ASCII characters."
     },
     "TagValue": {
       "Description": "The EC2 tag value that identifies this as a target for deployments.",
       "Type": "String",
-	  "Default": "CodeDeployDemo",
+      "Default": "CodeDeployDemo",
       "AllowedPattern": "[\\x20-\\x7E]*",
       "ConstraintDescription": "Can contain only ASCII characters."
     },

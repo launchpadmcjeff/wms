@@ -3,8 +3,8 @@
     "Parameters": {
         "SourceS3Bucket": "",
         "ApplicationName": "",
-        "ArtifactStoreS3Location": "",
-        "CodePipelineServiceRole": "",
+        "ArtifactStoreS3Location": "warez-my-stuff-codepipeline",
+        "CodePipelineServiceRole": "arn:aws:iam::737930803050:role/AWS-CodePipeline-Service",
         "SourceS3ObjectKey": "",
         "DeploymentGroupName": ""
     },
