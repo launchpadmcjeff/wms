@@ -25,7 +25,7 @@
         "ArtifactStoreS3Location": {
             "Description": "The EC2 tag key that identifies this as a target for deployments.",
             "Type": "String",
-            "Default": "warez-my-stuff-codepipeline",
+            "Default": "codepipeline-us-west-2-435776636860",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
