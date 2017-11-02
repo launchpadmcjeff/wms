@@ -1,65 +1,53 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "The CodePipeline Stack.  It builds the infrastructure to get to production.",
     "Parameters": {
-        "SourceS3Bucket": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
-            "Type": "String",
-            "Default": "Name",
-            "AllowedPattern": "[\\x20-\\x7E]*",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
-        "ApplicationName": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
-            "Type": "String",
-            "Default": "Name",
-            "AllowedPattern": "[\\x20-\\x7E]*",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
-        "ProjectName": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
+        "CodeBuildProjectName": {
+            "Description": "The project name in CodeBuild.",
             "Type": "String",
             "Default": "warez-my-stuff",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
         "ArtifactStoreS3Location": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
+            "Description": "The S3 bucket for intermediate results.",
             "Type": "String",
             "Default": "codepipeline-us-west-2-435776636860",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
-        "CodePipelineServiceRole": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
-            "Type": "String",
-            "Default": "arn:aws:iam::737930803050:role/AWS-CodePipeline-Service",
-            "AllowedPattern": "[\\x20-\\x7E]*",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
-        "SourceS3ObjectKey": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
-            "Type": "String",
-            "Default": "warez-my-stuff-codepipeline",
-            "AllowedPattern": "[\\x20-\\x7E]*",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
-        "DeploymentGroupName": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
-            "Type": "String",
-            "Default": "warez-my-stuff-codepipeline",
-            "AllowedPattern": "[\\x20-\\x7E]*",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
         "GitBranch": {
-            "Description": "The EC2 tag key that identifies this as a target for deployments.",
+            "Description": "The CodeCommit Git branch to build.",
             "Type": "String",
             "Default": "master",
+            "AllowedPattern": "[\\x20-\\x7E]*",
+            "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "BaseStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "base-stack"
+        },
+        "RepositoryName": {
+            "Description": "The Git repository to use for builds.",
+            "Type": "String",
+            "Default": "warez-my-stuff",
+            "AllowedPattern": "[\\x20-\\x7E]*",
+            "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "PipelineName": {
+            "Description": "The name for the new AWS CloudPipeline.",
+            "Type": "String",
+            "Default": "warez-my-stuff",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         }
     },
     "Resources": {
-        "warezMyStuffPipeline": {
+        "WarezMyStuffPipeline": {
             "Type": "AWS::CodePipeline::Pipeline",
             "Properties": {
                 "ArtifactStore": {
@@ -68,10 +56,14 @@
                         "Ref": "ArtifactStoreS3Location"
                     }
                 },
-                "Name": "warezMyStuffPipeline",
+                "Name": {
+                    "Ref": "PipelineName"
+                },
                 "RestartExecutionOnUpdate": false,
                 "RoleArn": {
-                    "Ref": "CodePipelineServiceRole"
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${BaseStackName}-CodePipelineRole"
+                    }
                 },
                 "Stages": [
                     {
@@ -89,8 +81,10 @@
                                     "BranchName": {
                                         "Ref": "GitBranch"
                                     },
-                                    "RepositoryName": "warez-my-stuff",
-                                    "PollForSourceChanges": false
+                                    "RepositoryName": {
+                                        "Ref": "RepositoryName"
+                                    },
+                                    "PollForSourceChanges": true
                                 },
                                 "OutputArtifacts": [
                                     {
@@ -119,7 +113,7 @@
                                 },
                                 "Configuration": {
                                     "ProjectName": {
-                                        "Ref": "ProjectName"
+                                        "Ref": "CodeBuildProjectName"
                                     }
                                 },
                                 "RunOrder": 1
