@@ -1,0 +1,72 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "CodeBuildProjectName": {
+            "Description": "Name of the CodeBuild project.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "test-codebuild"
+        },
+        "CodeBuildProjectDescription": {
+            "Description": "The CodeBuild project description.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "test-codebuild"
+        }
+    },
+    "Resources": {
+        "CodeBuild": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Location": "String",
+                    "Name": "String",
+                    "NamespaceType": "String",
+                    "Packaging": "String",
+                    "Path": "String",
+                    "Type": "CODECOMMIT"
+                },
+                "Description": {
+                    "Ref": "CodeBuildProjectDescription"
+                },
+                "EncryptionKey": "String",
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "EnvironmentVariables": [
+                        {
+                            "Name": "String",
+                            "Value": "String"
+                        }
+                    ],
+                    "Image": "aws/codebuild/java:openjdk-8",
+                    "PrivilegedMode": false,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "Name": {
+                    "Ref": "CodeBuildProjectName"
+                },
+                "ServiceRole": "String",
+                "Source": {
+                    "BuildSpec": "buildspec.yml",
+                    "Location": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/testing-spring-boot-applications",
+                    "Type": "CODECOMMIT"
+                },
+                "Tags": [
+                    {
+                        "Key": "Key1",
+                        "Value": "Value1"
+                    },
+                    {
+                        "Key": "Key2",
+                        "Value": "Value2"
+                    }
+                ],
+                "TimeoutInMinutes": 4
+            }
+        }
+    }
+}
