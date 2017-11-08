@@ -3,13 +3,13 @@
     "Description": "CodeDeploy template for deploying code.",
     "Metadata": {},
     "Parameters": {
-        "ApplicationName": {
-            "Description": "A name for the CodeDeploy application.",
+        "RoleStackName": {
+            "Description": "The stack exporting service roles.",
             "Type": "String",
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack-junkyard",
+            "Default": "wms",
             "ConstraintDescription": "ApplicationName is a AWS Name Type. Ending with a dash is also illegal"
         },
         "DeploymentGroupName": {
@@ -18,7 +18,7 @@
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack-junkyard-group",
+            "Default": "wms-group",
             "ConstraintDescription": "DeploymentGroupName is a AWS Name Type. Two consecutive dashes is also illegal"
         },
         "DeploymentConfigName": {
@@ -27,40 +27,25 @@
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack-junkyard-config",
+            "Default": "wms-config",
             "ConstraintDescription": "DeploymentConfigName is a AWS Name Type. Two consecutive dashes is also illegal"
-        },
-        "BaseStackName": {
-            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
-            "Type": "String",
-            "MinLength": 1,
-            "MaxLength": 255,
-            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack"
         }
     },
     "Resources": {
-        "Application": {
+        "WmsApplication": {
             "Type": "AWS::CodeDeploy::Application",
-            "Properties": {
-                "ApplicationName": {
-                    "Ref": "ApplicationName"
-                }
-            },
+            "Properties": {},
             "Metadata": {}
         },
         "DeploymentGroup": {
             "Type": "AWS::CodeDeploy::DeploymentGroup",
             "Properties": {
                 "ApplicationName": {
-                    "Ref": "ApplicationName"
-                },
-                "DeploymentGroupName": {
-                    "Ref": "DeploymentGroupName"
+                    "Ref": "WmsApplication"
                 },
                 "ServiceRoleArn": {
                     "Fn::ImportValue": {
-                        "Fn::Sub": "${BaseStackName}-CodeDeployServiceRole"
+                        "Fn::Sub": "${RoleStackName}-CodeDeployRole"
                     }
                 },
                 "DeploymentConfigName": "CodeDeployDefault.OneAtATime",
@@ -68,7 +53,7 @@
                     {
                         "Key": "Environment",
                         "Type": "KEY_AND_VALUE",
-                        "Value": "code-deploy-junkyard"
+                        "Value": "code-deploy-wms"
                     }
                 ]
             },

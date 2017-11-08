@@ -247,7 +247,7 @@
                   "Sid": "CodeCommitPolicy",
                   "Effect": "Allow",
                   "Action": [
-                    "codecommit:GitPull"
+                    "codecommit:*"
                   ],
                   "Resource": [
                     "*"
@@ -322,10 +322,13 @@
         }
       }
     },
-    "CodeDeployRole":  {
+    "CodeDeployRole": {
       "Description": "The service role for CodeDeploy",
       "Value": {
-        "Ref": "CodeDeployRole"
+        "Fn::GetAtt": [
+          "CodeDeployRole",
+          "Arn"
+        ]
       },
       "Export": {
         "Name": {

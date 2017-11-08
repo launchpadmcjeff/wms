@@ -2,18 +2,26 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "The CodePipeline Stack.  It builds the infrastructure to get to production.",
     "Parameters": {
-        "BaseStackName": {
+        "RoleStackName": {
             "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
             "Type": "String",
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack"
+            "Default": "wms-roles"
+        },
+        "VpcStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-vpc"
         },
         "CodeBuildProjectName": {
             "Description": "The CodeBuild project name to build.",
             "Type": "String",
-            "Default": "junkyard-codebuild",
+            "Default": "wms-codebuild",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
@@ -27,14 +35,14 @@
         "RepositoryName": {
             "Description": "The Git repository to use for builds.",
             "Type": "String",
-            "Default": "junkyard",
+            "Default": "warez-my-stuff",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
         "PipelineName": {
             "Description": "The name for the new AWS CloudPipeline.",
             "Type": "String",
-            "Default": "junkyard-pipeline",
+            "Default": "wms",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
@@ -44,7 +52,7 @@
             "Type": "String"
         },
         "TestStackName": {
-            "Default": "junkyard-single-instance",
+            "Default": "wms-single-instance",
             "Description": "A name for the test stack",
             "Type": "String"
         },
@@ -59,7 +67,7 @@
             "Type": "String"
         },
         "ProdStackName": {
-            "Default": "junkyard-blue-green",
+            "Default": "wms-blue-green",
             "Description": "A name for the production stack",
             "Type": "String"
         },
@@ -69,7 +77,7 @@
             "Type": "String"
         },
         "ChangeSetName": {
-            "Default": "junkyard-blue-green-changeset",
+            "Default": "wms-blue-green-changeset",
             "Description": "A name for the production stack change set",
             "Type": "String"
         },
@@ -83,7 +91,7 @@
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack-junkyard",
+            "Default": "wms-codedeploy-WmsApplication-1E7STJZGIOA3W",
             "ConstraintDescription": "ApplicationName is a AWS Name Type. Ending with a dash is also illegal"
         },
         "DeploymentGroupName": {
@@ -92,7 +100,7 @@
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "base-stack-junkyard-group",
+            "Default": "wms-codedeploy-DeploymentGroup-11GL813C8HAQP",
             "ConstraintDescription": "DeploymentGroupName is a AWS Name Type. Two consecutive dashes is also illegal"
         }
     },
@@ -104,7 +112,8 @@
                         "default": "CodePipeline Settings"
                     },
                     "Parameters": [
-                        "BaseStackName",
+                        "RoleStackName",
+                        "VpcStackName",
                         "PipelineName",
                         "Email"
                     ]
@@ -173,7 +182,7 @@
                     "Type": "S3",
                     "Location": {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${BaseStackName}-CodePipelineArtifactLocation"
+                            "Fn::Sub": "${VpcStackName}-CodePipelineArtifactLocation"
                         }
                     }
                 },
@@ -183,7 +192,7 @@
                 "RestartExecutionOnUpdate": true,
                 "RoleArn": {
                     "Fn::ImportValue": {
-                        "Fn::Sub": "${BaseStackName}-CodePipelineRole"
+                        "Fn::Sub": "${RoleStackName}-CodePipelineRole"
                     }
                 },
                 "Stages": [
@@ -284,7 +293,7 @@
                                     "ActionMode": "REPLACE_ON_FAILURE",
                                     "RoleArn": {
                                         "Fn::ImportValue": {
-                                            "Fn::Sub": "${BaseStackName}-CloudFormationRole"
+                                            "Fn::Sub": "${RoleStackName}-CloudFormationRole"
                                         }
                                     },
                                     "Capabilities": "CAPABILITY_NAMED_IAM",
@@ -353,7 +362,7 @@
                                     "ActionMode": "DELETE_ONLY",
                                     "RoleArn": {
                                         "Fn::ImportValue": {
-                                            "Fn::Sub": "${BaseStackName}-CloudFormationRole"
+                                            "Fn::Sub": "${RoleStackName}-CloudFormationRole"
                                         }
                                     },
                                     "StackName": {
@@ -384,7 +393,7 @@
                                     "ActionMode": "CHANGE_SET_REPLACE",
                                     "RoleArn": {
                                         "Fn::ImportValue": {
-                                            "Fn::Sub": "${BaseStackName}-CloudFormationRole"
+                                            "Fn::Sub": "${RoleStackName}-CloudFormationRole"
                                         }
                                     },
                                     "Capabilities": "CAPABILITY_NAMED_IAM",
@@ -436,7 +445,7 @@
                                     },
                                     "RoleArn": {
                                         "Fn::ImportValue": {
-                                            "Fn::Sub": "${BaseStackName}-CloudFormationRole"
+                                            "Fn::Sub": "${RoleStackName}-CloudFormationRole"
                                         }
                                     },
                                     "StackName": {
