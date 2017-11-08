@@ -7,9 +7,9 @@
             "Type": "AWS::EC2::KeyPair::KeyName",
             "ConstraintDescription": "Can contain only ASCII characters."
         },
-        "NetworkStackName": {
-            "Default": "base-stack",
-            "Description": "The base cloudformation stack",
+        "VpcStackName": {
+            "Default": "wms-vpc",
+            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
             "Type": "String"
         },
         "InstanceType": {
@@ -329,18 +329,18 @@
                 },
                 "SubnetId": {
                     "Fn::ImportValue": {
-                        "Fn::Sub": "${NetworkStackName}-SubnetID0"
+                        "Fn::Sub": "${VpcStackName}-SubnetID0"
                     }
                 },
                 "SecurityGroupIds": [
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-TestWebServerSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-TestWebServerSecurityGroupID"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SshSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-SshSecurityGroupID"
                         }
                     }
                 ],
@@ -402,11 +402,11 @@
                 "Tags": [
                     {
                         "Key": "Environment",
-                        "Value": "code-deploy-junkyard"
+                        "Value": "code-deploy-wms"
                     },
                     {
                         "Key": "Name",
-                        "Value": "code-deploy-junkyard"
+                        "Value": "code-deploy-wms"
                     }
                 ]
             }
@@ -414,7 +414,7 @@
     },
     "Outputs": {
         "WebsiteURL": {
-            "Description": "URL for newly created LAMP stack",
+            "Description": "URL for newly created single-instance stack",
             "Value": {
                 "Fn::Join": [
                     "",
