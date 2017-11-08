@@ -1,0 +1,112 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "The CodeBuild stack. It builds teh codez.",
+    "Parameters": {
+        "CodeBuildProjectName": {
+            "Description": "The name for this build project. This name must be unique across all of the build projects in your AWS account.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-codebuild"
+        },
+        "CodeBuildProjectDescription": {
+            "Description": "The description for this build project.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-codebuild"
+        },
+        "GroupId": {
+            "Description": "Used for the path folder in the S3 bucket.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-projectName"
+        },
+        "ArtifactId": {
+            "Description": "Used for the name folder in the S3 bucket.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-deployables"
+        },
+        "RoleStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the Service Roles.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-roles"
+        },
+        "VpcStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the Service Roles.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-vpc"
+        }
+    },
+    "Resources": {
+        "CodeBuild": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Location": {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${VpcStackName}-CodeBuildArtifactLocation"
+                        }
+                    },
+                    "Name": {"Ref": "ArtifactId"},
+                    "NamespaceType": "NONE",
+                    "Packaging": "NONE",
+                    "Path": {"Ref": "GroupId"},
+                    "Type": "S3"
+                },
+                "Description": {
+                    "Ref": "CodeBuildProjectDescription"
+                },
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "EnvironmentVariables": [
+                        {
+                            "Name": "String",
+                            "Value": "String"
+                        }
+                    ],
+                    "Image": "aws/codebuild/java:openjdk-8",
+                    "PrivilegedMode": false,
+                    "Type": "LINUX_CONTAINER"
+                },
+                "Name": {
+                    "Ref": "CodeBuildProjectName"
+                },
+                "ServiceRole": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${RoleStackName}-CodeBuildRole"
+                    }
+                },
+                "Source": {
+                    "BuildSpec": "aws/buildspec.yml",
+                    "Location": "https://git-codecommit.us-west-2.amazonaws.com/v1/repos/warez-my-stuff",
+                    "Type": "CODECOMMIT"
+                },
+                "Tags": [
+                    {
+                        "Key": "Key1",
+                        "Value": "Value1"
+                    },
+                    {
+                        "Key": "Key2",
+                        "Value": "Value2"
+                    }
+                ],
+                "TimeoutInMinutes": 10
+            }
+        }
+    }
+}

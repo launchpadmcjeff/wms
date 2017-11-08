@@ -1,0 +1,90 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "CodeDeploy template for deploying code.",
+    "Metadata": {},
+    "Parameters": {
+        "ApplicationName": {
+            "Description": "A name for the CodeDeploy application.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "base-stack-junkyard",
+            "ConstraintDescription": "ApplicationName is a AWS Name Type. Ending with a dash is also illegal"
+        },
+        "DeploymentGroupName": {
+            "Description": "A name for the CodeDeploy group.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "base-stack-junkyard-group",
+            "ConstraintDescription": "DeploymentGroupName is a AWS Name Type. Two consecutive dashes is also illegal"
+        },
+        "DeploymentConfigName": {
+            "Description": "A name for the CodeDeploy config.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "base-stack-junkyard-config",
+            "ConstraintDescription": "DeploymentConfigName is a AWS Name Type. Two consecutive dashes is also illegal"
+        },
+        "BaseStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "base-stack"
+        }
+    },
+    "Resources": {
+        "Application": {
+            "Type": "AWS::CodeDeploy::Application",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "ApplicationName"
+                }
+            },
+            "Metadata": {}
+        },
+        "DeploymentGroup": {
+            "Type": "AWS::CodeDeploy::DeploymentGroup",
+            "Properties": {
+                "ApplicationName": {
+                    "Ref": "ApplicationName"
+                },
+                "DeploymentGroupName": {
+                    "Ref": "DeploymentGroupName"
+                },
+                "ServiceRoleArn": {
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${BaseStackName}-CodeDeployServiceRole"
+                    }
+                },
+                "DeploymentConfigName": "CodeDeployDefault.OneAtATime",
+                "Ec2TagFilters": [
+                    {
+                        "Key": "Environment",
+                        "Type": "KEY_AND_VALUE",
+                        "Value": "code-deploy-junkyard"
+                    }
+                ]
+            },
+            "Metadata": {}
+        },
+        "DeploymentConfig": {
+            "Type": "AWS::CodeDeploy::DeploymentConfig",
+            "Properties": {
+                "DeploymentConfigName": {
+                    "Ref": "DeploymentConfigName"
+                },
+                "MinimumHealthyHosts": {
+                    "Type": "HOST_COUNT",
+                    "Value": 1
+                }
+            }
+        }
+    }
+}

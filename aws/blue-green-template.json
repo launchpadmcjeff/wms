@@ -1,0 +1,362 @@
+{
+    "Description": "This template creates the resources required for a sample AWS CodeDeploy blue/green deployment. **WARNING** This template creates one or more Amazon EC2 instances. You will be billed for the AWS resources created by this template.",
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "NetworkStackName": {
+            "Description": "The name of the base stack.",
+            "Default": "base-stack",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "32",
+            "ConstraintDescription": "Must contain only alphanumeric characters or hyphens, and cannot begin or end with a hyphen. Must have a maximum of 32 characters."
+        },
+        "LoadBalancerName": {
+            "Description": "The name of the load balancer.",
+            "Default": "junkyard-elb",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "32",
+            "ConstraintDescription": "Must contain only alphanumeric characters or hyphens, and cannot begin or end with a hyphen. Must have a maximum of 32 characters."
+        },
+        "KeyPairName": {
+            "Description": "Name of an existing Amazon EC2 key pair to enable SSH or RDP access to the instances.",
+            "Default": "aws",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "255",
+            "AllowedPattern": "[\\x20-\\x7E]*",
+            "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "InstanceCount": {
+            "Description": "Number of Amazon EC2 instances in an autoscaling group.",
+            "Type": "Number",
+            "Default": "1",
+            "ConstraintDescription": "Must be a number between 1 and 3.",
+            "MinValue": "1",
+            "MaxValue": "3"
+        },
+        "InstanceType": {
+            "Description": "Number of Amazon EC2 instances in an autoscaling group.",
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large"
+            ],
+            "ConstraintDescription": "Must be a valid EC2 Instance type"
+        }
+    },
+    "Mappings": {
+        "RegionOS2AMI": {
+            "us-east-1": {
+                "Linux": "ami-b73b63a0"
+            },
+            "us-west-2": {
+                "Linux": "ami-5ec1673e"
+            },
+            "eu-west-1": {
+                "Linux": "ami-9398d3e0"
+            },
+            "ap-southeast-2": {
+                "Linux": "ami-db704cb8"
+            },
+            "ap-southeast-1": {
+                "Linux": "ami-b953f2da"
+            },
+            "ap-south-1": {
+                "Linux": "ami-34b4c05b"
+            },
+            "cn-north-1": {
+                "Linux": "ami-8e6aa0e3"
+            },
+            "cn-northwest-1": {
+                "Linux": "ami-9e606bfc"
+            },
+            "us-east-2": {
+                "Linux": "ami-58277d3d"
+            },
+            "us-west-1": {
+                "Linux": "ami-23e8a343"
+            },
+            "eu-central-1": {
+                "Linux": "ami-f9619996"
+            },
+            "ap-northeast-1": {
+                "Linux": "ami-0c11b26d"
+            },
+            "sa-east-1": {
+                "Linux": "ami-97831ffb"
+            },
+            "eu-west-2": {
+                "Linux": "ami-d6cbc1b2"
+            },
+            "ca-central-1": {
+                "Linux": "ami-b48b39d0"
+            },
+            "ap-northeast-2": {
+                "Linux": "ami-983ce8f6"
+            },
+            "us-gov-west-1": {
+                "Linux": "ami-700a8f11"
+            }
+        }
+    },
+    "Resources": {
+        "InstanceRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "ec2.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/"
+            }
+        },
+        "InstanceRolePolicies": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+                "PolicyName": "InstanceRole",
+                "PolicyDocument": {
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "autoscaling:Describe*",
+                                "cloudformation:Describe*",
+                                "cloudformation:GetTemplate",
+                                "s3:Get*",
+                                "s3:List*"
+                            ],
+                            "Resource": "*"
+                        }
+                    ]
+                },
+                "Roles": [
+                    {
+                        "Ref": "InstanceRole"
+                    }
+                ]
+            }
+        },
+        "InstanceRoleInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Path": "/",
+                "Roles": [
+                    {
+                        "Ref": "InstanceRole"
+                    }
+                ]
+            }
+        },
+        "ClassicLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
+            "Properties": {
+                "LoadBalancerName": {
+                    "Ref": "LoadBalancerName"
+                },
+                "Subnets": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID0"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID1"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID2"
+                        }
+                    }
+                ],
+                "Listeners": [
+                    {
+                        "LoadBalancerPort": "80",
+                        "InstancePort": "8080",
+                        "Protocol": "HTTP"
+                    }
+                ],
+                "HealthCheck": {
+                    "Target": "HTTP:8080/health",
+                    "HealthyThreshold": "2",
+                    "UnhealthyThreshold": "5",
+                    "Interval": "10",
+                    "Timeout": "5"
+                },
+                "SecurityGroups": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-ProdWebServerSecurityGroupID"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SshSecurityGroupID"
+                        }
+                    }
+                ]
+            }
+        },
+        "WaitHandle": {
+            "Type": "AWS::CloudFormation::WaitConditionHandle"
+        },
+        "WaitCondition": {
+            "Type": "AWS::CloudFormation::WaitCondition",
+            "Properties": {
+                "Count": {
+                    "Ref": "InstanceCount"
+                },
+                "Handle": {
+                    "Ref": "WaitHandle"
+                },
+                "Timeout": "1800"
+            }
+        },
+        "BlueGreenLaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "IamInstanceProfile": {
+                    "Ref": "InstanceRoleInstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "RegionOS2AMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "Linux"
+                    ]
+                },
+                "InstanceType": {
+                    "Ref": "InstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyPairName"
+                },
+                "SecurityGroups": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-TestWebServerSecurityGroupID"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-ProdWebServerSecurityGroupID"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SshSecurityGroupID"
+                        }
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -ex\n",
+                                "yum update -y aws-cfn-bootstrap\n",
+                                "yum install -y aws-cli\n",
+                                "# Helper function.\n",
+                                "function error_exit\n",
+                                "{\n",
+                                "/opt/aws/bin/cfn-signal -e 1 -r \"$1\" '",
+                                {
+                                    "Ref": "WaitHandle"
+                                },
+                                "'\n",
+                                "exit 1\n",
+                                "}\n",
+                                "yum install -y java-1.8.0 || error_exit error\n",
+                                "alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java || error_exit error\n",
+                                "# Install the AWS CodeDeploy Agent.\n",
+                                "cd /home/ec2-user/\n",
+                                "aws s3 cp 's3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm' . || error_exit error\n",
+                                "yum -y install codedeploy-agent.noarch.rpm || error_exit error\n",
+                                "# All is well, so signal success.\n",
+                                "/opt/aws/bin/cfn-signal -e 0 -r \"AWS CodeDeploy Agent setup complete.\" '",
+                                {
+                                    "Ref": "WaitHandle"
+                                },
+                                "'\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "BlueGreenAutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "LaunchConfigurationName": {
+                    "Ref": "BlueGreenLaunchConfiguration"
+                },
+                "LoadBalancerNames": [
+                    {
+                        "Ref": "ClassicLoadBalancer"
+                    }
+                ],
+                "MaxSize": {
+                    "Ref": "InstanceCount"
+                },
+                "MinSize": {
+                    "Ref": "InstanceCount"
+                },
+                "DesiredCapacity": {
+                    "Ref": "InstanceCount"
+                },
+                "AvailabilityZones": [
+                    "us-west-2a",
+                    "us-west-2b",
+                    "us-west-2c"
+                ],
+                "VPCZoneIdentifier": [
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID0"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID1"
+                        }
+                    },
+                    {
+                        "Fn::ImportValue": {
+                            "Fn::Sub": "${NetworkStackName}-SubnetID2"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "AutoScalingGroupName": {
+            "Value": {
+                "Ref": "BlueGreenAutoScalingGroup"
+            }
+        },
+        "LoadBalancerName": {
+            "Value": {
+                "Ref": "ClassicLoadBalancer"
+            }
+        }
+    }
+}

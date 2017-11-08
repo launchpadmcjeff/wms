@@ -1,0 +1,8 @@
+{
+  "Parameters" : { 
+    "KeyPairName" : "aws",
+    "InstanceCount" : "3",
+    "InstanceType": "t2.micro",
+    "LoadBalancerName": "junkyard-elb"
+  }
+}
