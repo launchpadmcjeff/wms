@@ -1,8 +1,8 @@
 {
   "Parameters" : { 
-    "KeyPairName" : "aws",
+    "KeyPairName" : "aws-us-east-1",
     "InstanceCount" : "3",
     "InstanceType": "t2.micro",
-    "LoadBalancerName": "junkyard-elb"
+    "LoadBalancerName": "wms-elb"
   }
 }

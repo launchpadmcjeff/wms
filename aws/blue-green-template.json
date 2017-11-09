@@ -2,9 +2,9 @@
     "Description": "This template creates the resources required for a sample AWS CodeDeploy blue/green deployment. **WARNING** This template creates one or more Amazon EC2 instances. You will be billed for the AWS resources created by this template.",
     "AWSTemplateFormatVersion": "2010-09-09",
     "Parameters": {
-        "NetworkStackName": {
-            "Description": "The name of the base stack.",
-            "Default": "base-stack",
+        "VpcStackName": {
+            "Description": "The name of the VPC stack.",
+            "Default": "wms-vpc",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "32",
@@ -12,7 +12,7 @@
         },
         "LoadBalancerName": {
             "Description": "The name of the load balancer.",
-            "Default": "junkyard-elb",
+            "Default": "wms-elb",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "32",
@@ -20,7 +20,7 @@
         },
         "KeyPairName": {
             "Description": "Name of an existing Amazon EC2 key pair to enable SSH or RDP access to the instances.",
-            "Default": "aws",
+            "Default": "aws-us-east-1",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "255",
@@ -171,17 +171,17 @@
                 "Subnets": [
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SubnetID0"
+                            "Fn::Sub": "${VpcStackName}-SubnetID0"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SubnetID1"
+                            "Fn::Sub": "${VpcStackName}-SubnetID1"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SubnetID2"
+                            "Fn::Sub": "${VpcStackName}-SubnetID2"
                         }
                     }
                 ],
@@ -202,12 +202,12 @@
                 "SecurityGroups": [
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-ProdWebServerSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-ProdWebServerSecurityGroupID"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SshSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-SshSecurityGroupID"
                         }
                     }
                 ]
@@ -252,17 +252,17 @@
                 "SecurityGroups": [
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-TestWebServerSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-TestWebServerSecurityGroupID"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-ProdWebServerSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-ProdWebServerSecurityGroupID"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SshSecurityGroupID"
+                            "Fn::Sub": "${VpcStackName}-SshSecurityGroupID"
                         }
                     }
                 ],
@@ -322,25 +322,20 @@
                 "DesiredCapacity": {
                     "Ref": "InstanceCount"
                 },
-                "AvailabilityZones": [
-                    "us-west-2a",
-                    "us-west-2b",
-                    "us-west-2c"
-                ],
                 "VPCZoneIdentifier": [
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SubnetID0"
+                            "Fn::Sub": "${VpcStackName}-SubnetID0"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SubnetID1"
+                            "Fn::Sub": "${VpcStackName}-SubnetID1"
                         }
                     },
                     {
                         "Fn::ImportValue": {
-                            "Fn::Sub": "${NetworkStackName}-SubnetID2"
+                            "Fn::Sub": "${VpcStackName}-SubnetID2"
                         }
                     }
                 ]
