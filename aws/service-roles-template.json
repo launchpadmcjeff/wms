@@ -343,10 +343,7 @@
     "InstanceRoleInstanceProfile": {
       "Description": "The role for EC2 instances",
       "Value": {
-        "Fn::GetAtt": [
-          "InstanceRoleInstanceProfile",
-          "Arn"
-        ]
+        "Ref": "InstanceRoleInstanceProfile"
       },
       "Export": {
         "Name": {
