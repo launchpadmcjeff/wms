@@ -320,7 +320,7 @@
                     "Ref": "InstanceType"
                 },
                 "KeyName": {
-                    "Fn::Sub": "AWS::RegionName"
+                    "Fn::Sub": "aws-${AWS::Region}"
                 },
                 "SubnetId": {
                     "Fn::ImportValue": {
