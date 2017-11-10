@@ -5,6 +5,8 @@ The CodeCommit repository polled by the pipeline
 The repository should be added as a remote and pushed
 An AWS key in the region for the instance stacks, such as single-instance-template or blue-green-template.
 
+boot the wildfly with this:
+bin/standalone.sh -b=0.0.0.0 # http://blog.arungupta.me/bind-wildfly-different-ip-address-multihomed/
 
 
 ```
