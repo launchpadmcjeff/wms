@@ -1,0 +1,26 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This template creates the resources required for a sample AWS CodeDeploy in-place deployment.",
+    "Resources": {
+        "GitRepo": {
+            "Type": "AWS::CodeCommit::Repository",
+            "Properties": {
+                "RepositoryDescription": "The wms repo",
+                "RepositoryName": "warez-my-stuff"
+            }
+        }
+    },
+    "Outputs": {
+        "GitRepo": {
+            "Description": "The git repo.",
+            "Value": {
+                "Ref": "GitRepo"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-GitRepo"
+                }
+            }
+        }
+    }
+}

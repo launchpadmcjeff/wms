@@ -13,7 +13,26 @@ function getBooleanHss {
 }
 
 
+function getBooleanHssOrDie {
+	while :
+	do
+		echo "getBooleanHss [1/0y/n/Y/N]"
+		echo $1
+		read junk
+		if [ $junk = "y" ]
+		then
+			break	
+		fi
+	done
+
+}
+
 function install {
+	aws cloudformation create-stack --region $1  --stack-name wms-codecommit \
+		--template-body file://codecommit-template.json
+	
+	getBooleanHssOrDie "Say y when the wms-codecommit stack is complete and the release is pushed..."
+
 	aws cloudformation create-stack --region $1  --stack-name wms-roles \
 		--template-body file://service-roles-template.json --capabilities CAPABILITY_IAM
 
