@@ -1,7 +1,7 @@
 {
   "Parameters" : { 
     "KeyPairName" : "aws-us-east-1",
-    "InstanceCount" : "3",
+    "InstanceCount" : "2",
     "InstanceType": "t2.micro",
     "LoadBalancerName": "wms-elb"
   }

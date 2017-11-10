@@ -18,15 +18,6 @@
             "MaxLength": "32",
             "ConstraintDescription": "Must contain only alphanumeric characters or hyphens, and cannot begin or end with a hyphen. Must have a maximum of 32 characters."
         },
-        "KeyPairName": {
-            "Description": "Name of an existing Amazon EC2 key pair to enable SSH or RDP access to the instances.",
-            "Default": "aws-us-east-1",
-            "Type": "String",
-            "MinLength": "1",
-            "MaxLength": "255",
-            "AllowedPattern": "[\\x20-\\x7E]*",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
         "InstanceCount": {
             "Description": "Number of Amazon EC2 instances in an autoscaling group.",
             "Type": "Number",
@@ -178,11 +169,6 @@
                         "Fn::ImportValue": {
                             "Fn::Sub": "${VpcStackName}-SubnetID1"
                         }
-                    },
-                    {
-                        "Fn::ImportValue": {
-                            "Fn::Sub": "${VpcStackName}-SubnetID2"
-                        }
                     }
                 ],
                 "Listeners": [
@@ -247,7 +233,7 @@
                     "Ref": "InstanceType"
                 },
                 "KeyName": {
-                    "Ref": "KeyPairName"
+                    "Fn::Sub": "aws-${AWS::Region}"
                 },
                 "SecurityGroups": [
                     {
@@ -331,11 +317,6 @@
                     {
                         "Fn::ImportValue": {
                             "Fn::Sub": "${VpcStackName}-SubnetID1"
-                        }
-                    },
-                    {
-                        "Fn::ImportValue": {
-                            "Fn::Sub": "${VpcStackName}-SubnetID2"
                         }
                     }
                 ]
