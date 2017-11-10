@@ -18,7 +18,7 @@ function install {
 		--template-body file://service-roles-template.json --capabilities CAPABILITY_IAM
 
 	aws cloudformation create-stack --profile wms  --stack-name wms-vpc \
-		--template-body file://vpc-only-template.json
+		--template-body file://vpc-3az-template.json
 
 	while :
 	do

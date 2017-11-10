@@ -138,58 +138,6 @@
         ]
       }
     },
-    "PublicSubnet3": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "3",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
-        "CidrBlock": "10.0.3.0/24",
-        "MapPublicIpOnLaunch": "true",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        ]
-      }
-    },
-    "PublicSubnet4": {
-      "Type": "AWS::EC2::Subnet",
-      "Properties": {
-        "VpcId": {
-          "Ref": "VPC"
-        },
-        "AvailabilityZone": {
-          "Fn::Select": [
-            "4",
-            {
-              "Fn::GetAZs": ""
-            }
-          ]
-        },
-        "CidrBlock": "10.0.4.0/24",
-        "MapPublicIpOnLaunch": "true",
-        "Tags": [
-          {
-            "Key": "Name",
-            "Value": {
-              "Ref": "AWS::StackName"
-            }
-          }
-        ]
-      }
-    },
     "InternetGateway": {
       "Type": "AWS::EC2::InternetGateway",
       "Properties": {
@@ -318,56 +266,6 @@
         }
       }
     },
-    "PublicSubnetRouteTableAssociation3": {
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "SubnetId": {
-          "Ref": "PublicSubnet3"
-        },
-        "RouteTableId": {
-          "Ref": "PublicRouteTable"
-        }
-      }
-    },
-    "PublicSubnetNetworkAclAssociation3": {
-      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties": {
-        "SubnetId": {
-          "Ref": "PublicSubnet3"
-        },
-        "NetworkAclId": {
-          "Fn::GetAtt": [
-            "VPC",
-            "DefaultNetworkAcl"
-          ]
-        }
-      }
-    },
-    "PublicSubnetRouteTableAssociation4": {
-      "Type": "AWS::EC2::SubnetRouteTableAssociation",
-      "Properties": {
-        "SubnetId": {
-          "Ref": "PublicSubnet4"
-        },
-        "RouteTableId": {
-          "Ref": "PublicRouteTable"
-        }
-      }
-    },
-    "PublicSubnetNetworkAclAssociation4": {
-      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-      "Properties": {
-        "SubnetId": {
-          "Ref": "PublicSubnet4"
-        },
-        "NetworkAclId": {
-          "Fn::GetAtt": [
-            "VPC",
-            "DefaultNetworkAcl"
-          ]
-        }
-      }
-    },
     "TestWebServerSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
@@ -438,9 +336,27 @@
           }
         ]
       }
+    },
+    "CodeCommitRepo": {
+      "Type": "AWS::CodeCommit::Repository",
+      "Properties": {
+        "RepositoryDescription": "The wms repo",
+        "RepositoryName": "warez-my-stuff"
+      }
     }
   },
   "Outputs": {
+    "CodeCommitRepo": {
+      "Description": "The git repo.",
+      "Value": {
+        "Ref": "CodeCommitRepo"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-CodeCommitRepo"
+        }
+      }
+    },
     "CodePipelineArtifactLocation": {
       "Description": "The S3 bucket holding codepipeline artifacts",
       "Value": {
@@ -504,28 +420,6 @@
       "Export": {
         "Name": {
           "Fn::Sub": "${AWS::StackName}-SubnetID2"
-        }
-      }
-    },
-    "PublicSubnet3": {
-      "Description": "The subnet ID to use for public web servers",
-      "Value": {
-        "Ref": "PublicSubnet3"
-      },
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${AWS::StackName}-SubnetID3"
-        }
-      }
-    },
-    "PublicSubnet4": {
-      "Description": "The subnet ID to use for public web servers",
-      "Value": {
-        "Ref": "PublicSubnet4"
-      },
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${AWS::StackName}-SubnetID4"
         }
       }
     },
