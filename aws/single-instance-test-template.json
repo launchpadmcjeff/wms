@@ -251,8 +251,7 @@
                                 "autoscaling:Describe*",
                                 "cloudformation:Describe*",
                                 "cloudformation:GetTemplate",
-                                "s3:Get*",
-                                "s3:List*"
+                                "s3:*"
                             ],
                             "Resource": "*"
                         }
