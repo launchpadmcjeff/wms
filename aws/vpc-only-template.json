@@ -24,10 +24,7 @@
             "Key": "String",
             "Value": "String"
           }
-        ],
-        "VersioningConfiguration": {
-          "Status": "Enabled"
-        }
+        ]
       }
     },
     "CodeBuildArtifactLocation": {

@@ -2,8 +2,16 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "The CodePipeline Stack.  It builds the infrastructure to get to production.",
     "Parameters": {
+        "CodeDeployStackName": {
+            "Description": "Name of an active CloudFormation stack that contains the CodeDeploy resources.",
+            "Type": "String",
+            "MinLength": 1,
+            "MaxLength": 255,
+            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
+            "Default": "wms-codedeploy"
+        },
         "RoleStackName": {
-            "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
+            "Description": "Name of an active CloudFormation stack that contains the role resources.",
             "Type": "String",
             "MinLength": 1,
             "MaxLength": 255,
@@ -84,24 +92,6 @@
         "Email": {
             "Description": "The email address where CodePipeline sends pipeline notifications",
             "Type": "String"
-        },
-        "CodeDeployApplication": {
-            "Description": "A name for the CodeDeploy application.",
-            "Type": "String",
-            "MinLength": 1,
-            "MaxLength": 255,
-            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "wms-codedeploy-WmsApplication-1E7STJZGIOA3W",
-            "ConstraintDescription": "ApplicationName is a AWS Name Type. Ending with a dash is also illegal"
-        },
-        "DeploymentGroupName": {
-            "Description": "A name for the CodeDeploy group.",
-            "Type": "String",
-            "MinLength": 1,
-            "MaxLength": 255,
-            "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "wms-codedeploy-DeploymentGroup-11GL813C8HAQP",
-            "ConstraintDescription": "DeploymentGroupName is a AWS Name Type. Two consecutive dashes is also illegal"
         }
     },
     "Metadata": {
@@ -114,6 +104,7 @@
                     "Parameters": [
                         "RoleStackName",
                         "VpcStackName",
+                        "CodeDeployStackName",
                         "PipelineName",
                         "Email"
                     ]
@@ -140,16 +131,7 @@
                 },
                 {
                     "Label": {
-                        "default": "Test Deploy Settings"
-                    },
-                    "Parameters": [
-                        "CodeDeployApplication",
-                        "DeploymentGroupName"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Production Stack Settings"
+                        "default": "Prod Stack Settings"
                     },
                     "Parameters": [
                         "ChangeSetName",
@@ -218,7 +200,7 @@
                                 },
                                 "OutputArtifacts": [
                                     {
-                                        "Name": "SourceOutput"
+                                        "Name": "Source01"
                                     }
                                 ],
                                 "RunOrder": 1
@@ -232,7 +214,7 @@
                                 "Name": "BuildAction",
                                 "InputArtifacts": [
                                     {
-                                        "Name": "SourceOutput"
+                                        "Name": "Source01"
                                     }
                                 ],
                                 "ActionTypeId": {
@@ -248,7 +230,7 @@
                                 },
                                 "OutputArtifacts": [
                                     {
-                                        "Name": "BuildOutput"
+                                        "Name": "Build01"
                                     }
                                 ],
                                 "RunOrder": 1
@@ -286,7 +268,7 @@
                                 },
                                 "InputArtifacts": [
                                     {
-                                        "Name": "SourceOutput"
+                                        "Name": "Source01"
                                     }
                                 ],
                                 "Configuration": {
@@ -301,10 +283,10 @@
                                         "Ref": "TestStackName"
                                     },
                                     "TemplateConfiguration": {
-                                        "Fn::Sub": "SourceOutput::${TestStackConfig}"
+                                        "Fn::Sub": "Source01::${TestStackConfig}"
                                     },
                                     "TemplatePath": {
-                                        "Fn::Sub": "SourceOutput::${TestStackTemplate}"
+                                        "Fn::Sub": "Source01::${TestStackTemplate}"
                                     }
                                 },
                                 "RunOrder": "2"
@@ -319,15 +301,19 @@
                                 },
                                 "Configuration": {
                                     "ApplicationName": {
-                                        "Ref": "CodeDeployApplication"
+                                        "Fn::ImportValue": {
+                                            "Fn::Sub": "${CodeDeployStackName}-CodeDeployApplication"
+                                        }
                                     },
                                     "DeploymentGroupName": {
-                                        "Ref": "DeploymentGroupName"
+                                        "Fn::ImportValue": {
+                                            "Fn::Sub": "${CodeDeployStackName}-CodeDeployDeploymentGroup"
+                                        }
                                     }
                                 },
                                 "InputArtifacts": [
                                     {
-                                        "Name": "BuildOutput"
+                                        "Name": "Build01"
                                     }
                                 ],
                                 "RunOrder": "3"
@@ -373,7 +359,7 @@
                             }
                         ]
                     },
-                     {
+                    {
                         "Name": "ProdStage",
                         "Actions": [
                             {
@@ -386,7 +372,7 @@
                                 },
                                 "InputArtifacts": [
                                     {
-                                        "Name": "SourceOutput"
+                                        "Name": "Source01"
                                     }
                                 ],
                                 "Configuration": {
@@ -404,10 +390,10 @@
                                         "Ref": "ChangeSetName"
                                     },
                                     "TemplateConfiguration": {
-                                        "Fn::Sub": "SourceOutput::${ProdStackConfig}"
+                                        "Fn::Sub": "Source01::${ProdStackConfig}"
                                     },
                                     "TemplatePath": {
-                                        "Fn::Sub": "SourceOutput::${ProdStackTemplate}"
+                                        "Fn::Sub": "Source01::${ProdStackTemplate}"
                                     }
                                 },
                                 "RunOrder": "1"

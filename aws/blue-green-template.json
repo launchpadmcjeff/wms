@@ -1,5 +1,5 @@
 {
-    "Description": "This template creates the resources required for a sample AWS CodeDeploy blue/green deployment. **WARNING** This template creates one or more Amazon EC2 instances. You will be billed for the AWS resources created by this template.",
+    "Description": "This template creates the resources required for a sample AWS CodeDeploy blue/green deployment.",
     "AWSTemplateFormatVersion": "2010-09-09",
     "Parameters": {
         "VpcStackName": {

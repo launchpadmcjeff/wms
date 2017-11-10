@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Single Instance Template",
+    "Description": "This template creates the resources required for a sample AWS CodeDeploy in-place deployment.",
     "Parameters": {
         "KeyName": {
             "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",

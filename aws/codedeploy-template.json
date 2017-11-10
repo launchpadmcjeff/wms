@@ -9,7 +9,7 @@
             "MinLength": 1,
             "MaxLength": 255,
             "AllowedPattern": "^[a-zA-Z][-a-zA-Z0-9]*$",
-            "Default": "wms",
+            "Default": "wms-roles",
             "ConstraintDescription": "ApplicationName is a AWS Name Type. Ending with a dash is also illegal"
         },
         "DeploymentGroupName": {
@@ -32,7 +32,7 @@
         }
     },
     "Resources": {
-        "WmsApplication": {
+        "Application": {
             "Type": "AWS::CodeDeploy::Application",
             "Properties": {},
             "Metadata": {}
@@ -41,7 +41,7 @@
             "Type": "AWS::CodeDeploy::DeploymentGroup",
             "Properties": {
                 "ApplicationName": {
-                    "Ref": "WmsApplication"
+                    "Ref": "Application"
                 },
                 "ServiceRoleArn": {
                     "Fn::ImportValue": {
@@ -68,6 +68,41 @@
                 "MinimumHealthyHosts": {
                     "Type": "HOST_COUNT",
                     "Value": 1
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "Application": {
+            "Description": "The CodeDeploy application",
+            "Value": {
+                "Ref": "Application"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CodeDeployApplication"
+                }
+            }
+        },
+        "DeploymentGroup": {
+            "Description": "The CodeDeploy deployment group",
+            "Value": {
+                "Ref": "DeploymentGroup"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CodeDeployDeploymentGroup"
+                }
+            }
+        },
+        "DeploymentConfig": {
+            "Description": "The CodeDeploy deployment configuration",
+            "Value": {
+                "Ref": "DeploymentConfig"
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}-CodeDeployConfig"
                 }
             }
         }

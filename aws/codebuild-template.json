@@ -1,6 +1,33 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "The CodeBuild stack. It builds teh codez.",
+    
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "CodeBuild Settings"
+                    },
+                    "Parameters": [
+                        "RoleStackName",
+                        "VpcStackName",
+                        "CodeBuildProjectName",
+                        "CodeBuildProjectDescription"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Source and Build Settings"
+                    },
+                    "Parameters": [
+                        "GroupId",
+                        "ArtifactId"
+                    ]
+                }
+            ]
+        }
+    },
     "Parameters": {
         "CodeBuildProjectName": {
             "Description": "The name for this build project. This name must be unique across all of the build projects in your AWS account.",
