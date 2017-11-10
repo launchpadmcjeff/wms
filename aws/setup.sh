@@ -59,7 +59,7 @@ function uninstall {
 
 	aws cloudformation delete-stack --profile wms --stack-name wms-codebuild
 
-	aws s3 rm s3://wms-vpc-codepipeline-us-east-1 --recursive
+	aws s3 rm s3://wms-vpc-codepipeline-us-east-2 --recursive
 
 	aws cloudformation delete-stack --profile wms --stack-name wms-vpc
 
@@ -68,6 +68,6 @@ function uninstall {
 
 }
 
-install
-#uninstall
+#install
+uninstall
 

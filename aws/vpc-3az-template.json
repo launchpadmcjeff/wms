@@ -336,27 +336,9 @@
           }
         ]
       }
-    },
-    "CodeCommitRepo": {
-      "Type": "AWS::CodeCommit::Repository",
-      "Properties": {
-        "RepositoryDescription": "The wms repo",
-        "RepositoryName": "warez-my-stuff"
-      }
     }
   },
   "Outputs": {
-    "CodeCommitRepo": {
-      "Description": "The git repo.",
-      "Value": {
-        "Ref": "CodeCommitRepo"
-      },
-      "Export": {
-        "Name": {
-          "Fn::Sub": "${AWS::StackName}-CodeCommitRepo"
-        }
-      }
-    },
     "CodePipelineArtifactLocation": {
       "Description": "The S3 bucket holding codepipeline artifacts",
       "Value": {
