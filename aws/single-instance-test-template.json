@@ -7,48 +7,18 @@
             "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
             "Type": "String"
         },
+        "RoleStackName": {
+            "Default": "wms-roles",
+            "Description": "Name of an active CloudFormation stack containing roles for this stack.",
+            "Type": "String"
+        },
         "InstanceType": {
             "Description": "WebServer EC2 instance type",
             "Type": "String",
             "Default": "t2.micro",
             "AllowedValues": [
-                "t1.micro",
                 "t2.micro",
-                "t2.small",
-                "t2.medium",
-                "m1.small",
-                "m1.medium",
-                "m1.large",
-                "m1.xlarge",
-                "m2.xlarge",
-                "m2.2xlarge",
-                "m2.4xlarge",
-                "m3.medium",
-                "m3.large",
-                "m3.xlarge",
-                "m3.2xlarge",
-                "c1.medium",
-                "c1.xlarge",
-                "c3.large",
-                "c3.xlarge",
-                "c3.2xlarge",
-                "c3.4xlarge",
-                "c3.8xlarge",
-                "g2.2xlarge",
-                "r3.large",
-                "r3.xlarge",
-                "r3.2xlarge",
-                "r3.4xlarge",
-                "r3.8xlarge",
-                "i2.xlarge",
-                "i2.2xlarge",
-                "i2.4xlarge",
-                "i2.8xlarge",
-                "hi1.4xlarge",
-                "hs1.8xlarge",
-                "cr1.8xlarge",
-                "cc2.8xlarge",
-                "cg1.4xlarge"
+                "t2.small"
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type"
         }
@@ -218,63 +188,6 @@
         }
     },
     "Resources": {
-        "InstanceRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
-                },
-                "Path": "/"
-            }
-        },
-        "InstanceRolePolicies": {
-            "Type": "AWS::IAM::Policy",
-            "Properties": {
-                "PolicyName": "InstanceRole",
-                "PolicyDocument": {
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Action": [
-                                "autoscaling:Describe*",
-                                "cloudformation:Describe*",
-                                "cloudformation:GetTemplate",
-                                "s3:*"
-                            ],
-                            "Resource": "*"
-                        }
-                    ]
-                },
-                "Roles": [
-                    {
-                        "Ref": "InstanceRole"
-                    }
-                ]
-            }
-        },
-        "InstanceRoleInstanceProfile": {
-            "Type": "AWS::IAM::InstanceProfile",
-            "Properties": {
-                "Path": "/",
-                "Roles": [
-                    {
-                        "Ref": "InstanceRole"
-                    }
-                ]
-            }
-        },
         "WebServerInstance": {
             "Type": "AWS::EC2::Instance",
             "CreationPolicy": {
@@ -296,7 +209,9 @@
             },
             "Properties": {
                 "IamInstanceProfile": {
-                    "Ref": "InstanceRoleInstanceProfile"
+                    "Fn::ImportValue": {
+                        "Fn::Sub": "${RoleStackName}-InstanceRoleInstanceProfile"
+                    }
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -368,7 +283,7 @@
                                 "alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java || error_exit 1\n",
                                 "cd /home/ec2-user/\n",
                                 "aws s3 cp s3://robowebi-nexus/wildfly-10.1.0.Final.tar.gz .\n",
-                                "tar tzvf wildfly-10.1.0.Final.tar.gz\n",
+                                "tar xzvf wildfly-10.1.0.Final.tar.gz\n",
                                 "chown -R ec2-user:ec2-user wildfly-10.1.0.Final\n",
                                 "# Install the AWS CodeDeploy Agent.\n",
                                 "aws s3 cp 's3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm' . || error_exit 1\n",
