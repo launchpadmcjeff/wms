@@ -2,11 +2,6 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "This template creates the resources required for a sample AWS CodeDeploy in-place deployment.",
     "Parameters": {
-        "KeyName": {
-            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
-            "Type": "AWS::EC2::KeyPair::KeyName",
-            "ConstraintDescription": "Can contain only ASCII characters."
-        },
         "VpcStackName": {
             "Default": "wms-vpc",
             "Description": "Name of an active CloudFormation stack that contains the networking resources, such as the subnet and security group, that will be used in this stack.",
@@ -325,7 +320,7 @@
                     "Ref": "InstanceType"
                 },
                 "KeyName": {
-                    "Ref": "KeyName"
+                    "Fn::Sub": "AWS::RegionName"
                 },
                 "SubnetId": {
                     "Fn::ImportValue": {

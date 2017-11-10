@@ -14,11 +14,11 @@ function getBooleanHss {
 
 
 function install {
-	aws cloudformation create-stack --profile wms  --stack-name wms-roles \
+	aws cloudformation create-stack --region $1  --stack-name wms-roles \
 		--template-body file://service-roles-template.json --capabilities CAPABILITY_IAM
 
-	aws cloudformation create-stack --profile wms  --stack-name wms-vpc \
-		--template-body file://vpc-3az-template.json
+	aws cloudformation create-stack --region $1  --stack-name wms-vpc \
+		--template-body file://vpc-${2}az-template.json
 
 	while :
 	do
@@ -29,10 +29,10 @@ function install {
 		fi
 	done
 
-	aws cloudformation create-stack --profile wms  --stack-name wms-codebuild \
+	aws cloudformation create-stack --region $1  --stack-name wms-codebuild \
 		--template-body file://codebuild-template.json
 
-	aws cloudformation create-stack --profile wms  --stack-name wms-codedeploy \
+	aws cloudformation create-stack --region $1  --stack-name wms-codedeploy \
 		--template-body file://codedeploy-template.json 
 
 
@@ -45,7 +45,7 @@ function install {
 		fi
 	done
 
-	aws cloudformation create-stack --profile wms  --stack-name wms-pipeline \
+	aws cloudformation create-stack --region $1  --stack-name wms-pipeline \
 		--template-body file://pipeline-short-template.json \
 		--parameters ParameterKey=Email,ParameterValue=launchpadmcjeff@gmail.com
 
@@ -53,21 +53,41 @@ function install {
 
 
 function uninstall {
-	aws cloudformation delete-stack --profile wms --stack-name wms-blue-green
-	aws cloudformation delete-stack --profile wms --stack-name wms-pipeline
-	aws cloudformation delete-stack --profile wms --stack-name wms-codedeploy
+	aws cloudformation delete-stack --region $1 --stack-name wms-blue-green
+	aws cloudformation delete-stack --region $1 --stack-name wms-pipeline
+	while :
+	do
+		getBooleanHss "Say y when the wms-pipeline stack is deleted..."
+		if [ $? -eq 0 ]
+		then
+			break
+		fi
+	done
+	aws cloudformation delete-stack --region $1 --stack-name wms-codedeploy
 
-	aws cloudformation delete-stack --profile wms --stack-name wms-codebuild
+	aws cloudformation delete-stack --region $1 --stack-name wms-codebuild
 
-	aws s3 rm s3://wms-vpc-codepipeline-us-east-2 --recursive
+	aws s3 rm s3://wms-vpc-codepipeline-$1 --recursive
 
-	aws cloudformation delete-stack --profile wms --stack-name wms-vpc
+	aws cloudformation delete-stack --region $1 --stack-name wms-vpc
 
 
-	aws cloudformation delete-stack --profile wms --stack-name wms-roles
+	aws cloudformation delete-stack --region $1 --stack-name wms-roles
 
 }
 
-#install
-uninstall
 
+
+if [ "$1" = "install" ]
+then
+	echo "install needs repo and key"
+	install $2 $3
+fi
+
+if [ "$1" = "uninstall" ]
+then
+	echo "uninstalling..."
+	uninstall $2
+fi
+
+echo "done $1"

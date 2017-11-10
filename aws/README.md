@@ -1,5 +1,12 @@
 # AWS Infrastructure Initialization
 
+## Prerequisites
+The CodeCommit repository polled by the pipeline
+The repository should be added as a remote and pushed
+An AWS key in the region for the instance stacks, such as single-instance-template or blue-green-template.
+
+
+
 ```
 $ aws cloudformation create-stack --profile wms  --stack-name wms-roles --template-body file://aws/service-roles-template.json --capabilities CAPABILITY_IAM
 {

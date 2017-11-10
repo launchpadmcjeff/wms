@@ -1,6 +1,5 @@
 {
-  "Parameters" : {   
-    "KeyName" : "aws-us-east-1",
+  "Parameters" : {
     "InstanceType": "t2.micro"
   }
 }
